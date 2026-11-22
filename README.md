@@ -24,68 +24,9 @@ This is an orchestration-by-notebook project: there is no application package, d
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    subgraph Source["S3 · sportsbar-dp3"]
-        C[customers CSV]
-        P[products CSV]
-        G[gross_price CSV]
-        OL[orders / landing CSVs]
-    end
+![AtliQon data pipeline architecture](docs/architecture.svg)
 
-    subgraph Setup["Databricks · setup"]
-        CAT[Create fmcg catalog<br/>bronze · silver · gold schemas]
-        DATE[Build monthly dim_date]
-        U[Schema-name utility]
-    end
-
-    subgraph Dimensions["Dimension pipelines"]
-        CB[bronze.customers]
-        CS[silver.customers]
-        CG[gold.sb_dim_customers]
-        PB[bronze.products]
-        PS[silver.products]
-        PG[gold.sb_dim_products]
-        GB[bronze.gross_price]
-        GS[silver.gross_price]
-        GG[gold.sb_dim_gross_price]
-    end
-
-    subgraph Facts["Order fact pipeline"]
-        OB[bronze.orders]
-        STB[bronze.staging_orders<br/>(incremental only)]
-        OS[silver.orders]
-        STS[silver.staging_orders<br/>(incremental only)]
-        OG[gold.sb_fact_orders]
-    end
-
-    subgraph Parent["Shared parent model · fmcg.gold"]
-        DC[dim_customers]
-        DP[dim_products]
-        DGP[dim_gross_price]
-        FO[fact_orders<br/>monthly grain]
-    end
-
-    CAT --> CB
-    CAT --> PB
-    CAT --> GB
-    CAT --> OB
-    U -. used by notebooks .-> Dimensions
-    U -. used by notebooks .-> Facts
-    DATE --> Parent
-
-    C --> CB --> CS --> CG --> DC
-    P --> PB --> PS --> PG --> DP
-    G --> GB --> GS --> GG --> DGP
-    OL --> OB --> OS --> OG --> FO
-    PS -->|product_id → product_code| GS
-    PS -->|product_id → product_code| OS
-    OL -. incremental landing batch .-> STB --> OS
-    STB --> STS --> OG
-```
-
-The `sb_` tables are child or staging-shaped Gold outputs. Dimension jobs merge them into the shared dimension tables. The order job aggregates the child daily fact to month, product, and customer before merging it into `fmcg.gold.fact_orders`.
-
+Source CSV files flow through Bronze ingestion, Silver cleanup and enrichment, then child Gold tables. Dimension pipelines merge child outputs into shared parent dimensions. The order pipeline keeps daily child facts and aggregates them to monthly grain for the parent fact table. Products enrich both pricing and orders through `product_id` → `product_code` lookups.
 ## Repository layout
 
 ```text
@@ -192,3 +133,4 @@ These notes reflect the implementation in the notebooks and are useful to check 
 <div align="center">
 <sub>Notebook-first data engineering project · Bronze → Silver → Gold</sub>
 </div>
+
