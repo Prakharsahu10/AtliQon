@@ -1,0 +1,70 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000" role="img" aria-labelledby="title desc">
+  <title id="title">AtliQon FMCG data pipeline architecture</title>
+  <desc id="desc">CSV sources flow through Bronze, Silver, and child Gold Delta tables into shared parent dimensions and a monthly fact table. Product data enriches pricing and order data.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+    <marker id="arrowAccent" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/></marker>
+    <style>
+      text{font-family:Inter,Segoe UI,Arial,sans-serif;fill:#172033}.title{font-size:28px;font-weight:700}.subtitle{font-size:14px;fill:#526176}.head{font-size:15px;font-weight:700;letter-spacing:.5px;fill:#fff}.row{font-size:15px;font-weight:700;fill:#334155}.node{fill:#fff;stroke:#cbd5e1;stroke-width:1.5}.nodeText{font-size:14px;font-weight:600}.small{font-size:12px;fill:#64748b}.source{fill:#fff7ed;stroke:#fdba74}.bronze{fill:#fff7ed;stroke:#f59e0b}.silver{fill:#eff6ff;stroke:#60a5fa}.gold{fill:#fefce8;stroke:#eab308}.parent{fill:#ecfdf5;stroke:#34d399}.line{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow)}.dashed{fill:none;stroke:#0f766e;stroke-width:2;stroke-dasharray:7 6;marker-end:url(#arrowAccent)}
+    </style>
+  </defs>
+  <rect width="1440" height="1000" rx="18" fill="#f8fafc"/>
+  <text x="42" y="52" class="title">AtliQon · FMCG Lakehouse</text>
+  <text x="42" y="79" class="subtitle">Sports Bar source data refined in Databricks and merged into the shared FMCG model</text>
+
+  <rect x="250" y="108" width="210" height="42" rx="10" fill="#c2410c"/><text x="355" y="135" text-anchor="middle" class="head">SOURCE · S3 CSV</text>
+  <rect x="490" y="108" width="210" height="42" rx="10" fill="#b45309"/><text x="595" y="135" text-anchor="middle" class="head">BRONZE · DELTA</text>
+  <rect x="730" y="108" width="210" height="42" rx="10" fill="#1d4ed8"/><text x="835" y="135" text-anchor="middle" class="head">SILVER · DELTA</text>
+  <rect x="970" y="108" width="210" height="42" rx="10" fill="#a16207"/><text x="1075" y="135" text-anchor="middle" class="head">CHILD GOLD</text>
+  <rect x="1210" y="108" width="190" height="42" rx="10" fill="#047857"/><text x="1305" y="135" text-anchor="middle" class="head">PARENT · GOLD</text>
+
+  <text x="42" y="219" class="row">Customers</text>
+  <text x="42" y="359" class="row">Products</text>
+  <text x="42" y="499" class="row">Pricing</text>
+  <text x="42" y="639" class="row">Orders</text>
+
+  <!-- Customers -->
+  <rect x="250" y="178" width="210" height="74" rx="12" class="node source"/><text x="355" y="210" text-anchor="middle" class="nodeText">customers/*.csv</text><text x="355" y="232" text-anchor="middle" class="small">S3 source files</text>
+  <rect x="490" y="178" width="210" height="74" rx="12" class="node bronze"/><text x="595" y="210" text-anchor="middle" class="nodeText">bronze.customers</text><text x="595" y="232" text-anchor="middle" class="small">raw rows + file metadata</text>
+  <rect x="730" y="178" width="210" height="74" rx="12" class="node silver"/><text x="835" y="210" text-anchor="middle" class="nodeText">silver.customers</text><text x="835" y="232" text-anchor="middle" class="small">dedupe · standardize</text>
+  <rect x="970" y="178" width="210" height="74" rx="12" class="node gold"/><text x="1075" y="210" text-anchor="middle" class="nodeText">sb_dim_customers</text><text x="1075" y="232" text-anchor="middle" class="small">child dimension shape</text>
+  <rect x="1210" y="178" width="190" height="74" rx="12" class="node parent"/><text x="1305" y="210" text-anchor="middle" class="nodeText">dim_customers</text><text x="1305" y="232" text-anchor="middle" class="small">merge by customer_code</text>
+
+  <!-- Products -->
+  <rect x="250" y="318" width="210" height="74" rx="12" class="node source"/><text x="355" y="350" text-anchor="middle" class="nodeText">products/*.csv</text><text x="355" y="372" text-anchor="middle" class="small">S3 source files</text>
+  <rect x="490" y="318" width="210" height="74" rx="12" class="node bronze"/><text x="595" y="350" text-anchor="middle" class="nodeText">bronze.products</text><text x="595" y="372" text-anchor="middle" class="small">raw rows + file metadata</text>
+  <rect x="730" y="318" width="210" height="74" rx="12" class="node silver"/><text x="835" y="350" text-anchor="middle" class="nodeText">silver.products</text><text x="835" y="372" text-anchor="middle" class="small">derive product_code</text>
+  <rect x="970" y="318" width="210" height="74" rx="12" class="node gold"/><text x="1075" y="350" text-anchor="middle" class="nodeText">sb_dim_products</text><text x="1075" y="372" text-anchor="middle" class="small">child dimension shape</text>
+  <rect x="1210" y="318" width="190" height="74" rx="12" class="node parent"/><text x="1305" y="350" text-anchor="middle" class="nodeText">dim_products</text><text x="1305" y="372" text-anchor="middle" class="small">merge by product_code</text>
+
+  <!-- Pricing -->
+  <rect x="250" y="458" width="210" height="74" rx="12" class="node source"/><text x="355" y="490" text-anchor="middle" class="nodeText">gross_price/*.csv</text><text x="355" y="512" text-anchor="middle" class="small">S3 source files</text>
+  <rect x="490" y="458" width="210" height="74" rx="12" class="node bronze"/><text x="595" y="490" text-anchor="middle" class="nodeText">bronze.gross_price</text><text x="595" y="512" text-anchor="middle" class="small">raw rows + file metadata</text>
+  <rect x="730" y="458" width="210" height="74" rx="12" class="node silver"/><text x="835" y="490" text-anchor="middle" class="nodeText">silver.gross_price</text><text x="835" y="512" text-anchor="middle" class="small">parse · validate · product join</text>
+  <rect x="970" y="458" width="210" height="74" rx="12" class="node gold"/><text x="1075" y="490" text-anchor="middle" class="nodeText">sb_dim_gross_price</text><text x="1075" y="512" text-anchor="middle" class="small">child pricing shape</text>
+  <rect x="1210" y="458" width="190" height="74" rx="12" class="node parent"/><text x="1305" y="490" text-anchor="middle" class="nodeText">dim_gross_price</text><text x="1305" y="512" text-anchor="middle" class="small">parent price dimension</text>
+
+  <!-- Orders -->
+  <rect x="250" y="598" width="210" height="74" rx="12" class="node source"/><text x="355" y="630" text-anchor="middle" class="nodeText">orders/landing/*.csv</text><text x="355" y="652" text-anchor="middle" class="small">full or incremental batch</text>
+  <rect x="490" y="598" width="210" height="74" rx="12" class="node bronze"/><text x="595" y="630" text-anchor="middle" class="nodeText">bronze.orders</text><text x="595" y="652" text-anchor="middle" class="small">incremental staging table</text>
+  <rect x="730" y="598" width="210" height="74" rx="12" class="node silver"/><text x="835" y="630" text-anchor="middle" class="nodeText">silver.orders</text><text x="835" y="652" text-anchor="middle" class="small">clean dates · join products</text>
+  <rect x="970" y="598" width="210" height="74" rx="12" class="node gold"/><text x="1075" y="630" text-anchor="middle" class="nodeText">sb_fact_orders</text><text x="1075" y="652" text-anchor="middle" class="small">daily child fact</text>
+  <rect x="1210" y="598" width="190" height="74" rx="12" class="node parent"/><text x="1305" y="630" text-anchor="middle" class="nodeText">fact_orders</text><text x="1305" y="652" text-anchor="middle" class="small">monthly parent grain</text>
+
+  <!-- Flow arrows -->
+  <path d="M460 215 H484" class="line"/><path d="M700 215 H724" class="line"/><path d="M940 215 H964" class="line"/><path d="M1180 215 H1204" class="line"/>
+  <path d="M460 355 H484" class="line"/><path d="M700 355 H724" class="line"/><path d="M940 355 H964" class="line"/><path d="M1180 355 H1204" class="line"/>
+  <path d="M460 495 H484" class="line"/><path d="M700 495 H724" class="line"/><path d="M940 495 H964" class="line"/><path d="M1180 495 H1204" class="line"/>
+  <path d="M460 635 H484" class="line"/><path d="M700 635 H724" class="line"/><path d="M940 635 H964" class="line"/><path d="M1180 635 H1204" class="line"/>
+
+  <!-- Product enrichment -->
+  <path d="M835 397 C835 430 835 438 835 452" class="dashed"/><text x="850" y="432" class="small">product lookup</text>
+  <path d="M790 392 C740 545 720 560 720 596" class="dashed"/><text x="635" y="557" class="small">product_id → product_code</text>
+
+  <!-- Setup -->
+  <rect x="250" y="744" width="510" height="112" rx="14" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+  <text x="278" y="778" class="nodeText">Databricks setup</text><text x="278" y="806" class="small">Create catalog fmcg and bronze / silver / gold schemas</text><text x="278" y="830" class="small">Shared utility notebook supplies schema names</text>
+  <rect x="790" y="744" width="610" height="112" rx="14" fill="#f0fdfa" stroke="#5eead4" stroke-width="1.5"/>
+  <text x="818" y="778" class="nodeText">Calendar dimension</text><text x="818" y="806" class="small">fmcg.gold.dim_date · one row per month start</text><text x="818" y="830" class="small">Configured range: Jan 2024 – Dec 2025</text>
+  <text x="42" y="930" class="small">Solid arrows show data movement · dashed arrows show product enrichment · all pipeline tables are Delta</text>
+</svg>
